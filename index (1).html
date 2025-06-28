@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Octopus Cell Builder Game</title>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1607083200891-96056863efb7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        #gameArea {
+            margin-top: 30px;
+        }
+
+        #functionDisplay {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .option {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .option:hover {
+            transform: scale(1.1);
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        #summary {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            font-size: 1.2em;
+        }
+
+        #octopus {
+            width: 150px;
+            margin: 20px auto;
+            display: block;
+            transition: transform 0.3s;
+        }
+
+        #octopus:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Octopus Cell Builder Game</h1>
+    <img id="octopus" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Common_Octopus.jpg" alt="Octopus">
+
+    <div id="gameArea">
+        <div id="functionDisplay"></div>
+        <div id="options"></div>
+        <div id="feedback"></div>
+        <div id="summary"></div>
+    </div>
+
+    <script>
+        const organelles = [
+            { name: "Nucleus", function: "Controls cell activities and contains DNA." },
+            { name: "Mitochondria", function: "Produces energy through cellular respiration." },
+            { name: "Chloroplast", function: "Performs photosynthesis to make food." },
+            { name: "Ribosome", function: "Synthesizes proteins." },
+            { name: "Cell Membrane", function: "Controls what enters and leaves the cell." },
+            { name: "Cell Wall", function: "Provides structure and protection." },
+            { name: "Cytoplasm", function: "Gel-like substance where organelles are suspended." },
+            { name: "Vacuole", function: "Stores nutrients, waste, and water." },
+            { name: "Flagella", function: "Helps in cell movement." },
+            { name: "Plasmid", function: "Carries additional DNA in bacteria." }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function startGame() {
+            shuffle(organelles);
+            currentIndex = 0;
+            score = 0;
+            document.getElementById('summary').innerHTML = '';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= organelles.length) {
+                showSummary();
+                return;
+            }
+
+            const organelle = organelles[currentIndex];
+            document.getElementById('functionDisplay').innerText = `The octopus wants to find the part of the cell that: ${organelle.function}`;
+
+            const correctOption = organelle.name;
+            let options = [correctOption];
+
+            while (options.length < 4) {
+                let randomOption = organelles[Math.floor(Math.random() * organelles.length)].name;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+
+            options = shuffle(options);
+
+            let optionsHTML = '';
+            options.forEach(option => {
+                optionsHTML += `<button class="option" onclick="checkAnswer('${option}')">${option}</button>`;
+            });
+
+            document.getElementById('options').innerHTML = optionsHTML;
+            document.getElementById('feedback').innerText = '';
+        }
+
+        function checkAnswer(selected) {
+            const correct = organelles[currentIndex].name;
+            if (selected === correct) {
+                score++;
+                document.getElementById('feedback').innerText = "Correct! The octopus is happy!";
+                document.getElementById('feedback').style.color = "lime";
+            } else {
+                document.getElementById('feedback').innerText = `Incorrect. The correct answer was ${correct}.`;
+                document.getElementById('feedback').style.color = "red";
+            }
+
+            currentIndex++;
+            setTimeout(loadQuestion, 2000);
+        }
+
+        function showSummary() {
+            const summaryText = `Game Over! Your final score is ${score} out of ${organelles.length}.`;
+            let performance = '';
+            if (score === organelles.length) {
+                performance = "Excellent! The octopus built the perfect cell!";
+            } else if (score >= organelles.length * 0.7) {
+                performance = "Good job! The octopus is almost a cell expert!";
+            } else {
+                performance = "Keep practicing to help the octopus learn more!";
+            }
+
+            document.getElementById('summary').innerHTML = `<p>${summaryText}</p><p>${performance}</p><button class="option" onclick="startGame()">Play Again</button>`;
+        }
+
+        startGame();
+    </script>
+
+</body>
+</html>
